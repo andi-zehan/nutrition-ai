@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read", "Write", "Edit", "Glob", "Grep",
+      "Bash(ls*)", "Bash(mkdir*)", "Bash(git*)",
+      "Bash(xcodebuild*)", "Bash(swift*)", "Bash(open*)",
+      "Bash(xcodegen*)", "Bash(which*)", "Bash(brew*)",
+      "Bash(cp*)", "Bash(mv*)", "Bash(rm *)", "Bash(cat*)",
+      "Bash(cd*)", "Bash(touch*)", "Bash(chmod*)",
+      "Bash(plutil*)", "Bash(sed*)", "Bash(find*)"
+    ]
+  }
+}

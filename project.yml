@@ -1,0 +1,64 @@
+name: NutritionAI
+options:
+  bundleIdPrefix: com.nutritionai
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+configs:
+  Debug: debug
+  Release: release
+
+configFiles:
+  Debug: Secrets.xcconfig
+  Release: Secrets.xcconfig
+
+targets:
+  NutritionAI:
+    type: application
+    platform: iOS
+    sources:
+      - path: NutritionAI
+    info:
+      path: NutritionAI/Info.plist
+      properties:
+        NSCameraUsageDescription: NutritionAI needs camera access to photograph meals for ingredient detection.
+        NSPhotoLibraryUsageDescription: NutritionAI needs photo library access to select meal photos.
+        OPENROUTER_API_KEY: $(OPENROUTER_API_KEY)
+        USDA_API_KEY: $(USDA_API_KEY)
+    settings:
+      base:
+        INFOPLIST_FILE: NutritionAI/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: 1
+        SUPPORTS_MACCATALYST: false
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+
+  NutritionAITests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: NutritionAITests
+    dependencies:
+      - target: NutritionAI
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
+
+  NutritionAIUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: NutritionAIUITests
+    dependencies:
+      - target: NutritionAI
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
