@@ -35,11 +35,12 @@ struct CaptureView: View {
                         .padding(.horizontal)
                 }
 
+                Spacer()
+
                 if viewModel.capturedPhoto == nil && !viewModel.isAnalyzing {
                     inputButtons
+                        .padding(.bottom, 32)
                 }
-
-                Spacer()
             }
             .navigationTitle("Capture")
             .navigationDestination(isPresented: $navigateToReview) {

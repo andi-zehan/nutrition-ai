@@ -20,7 +20,15 @@ final class USDANutritionRepository: NutritionLookupService, @unchecked Sendable
         let normalized = IngredientNormalizationService.normalize(ingredientName)
         let results = try await search(query: normalized)
 
-        guard let best = results.first else { return nil }
+        // Prefer SR Legacy over Foundation for more consistent nutrient IDs
+        let sorted = results.sorted { a, b in
+            let aLegacy = a.dataType == "SR Legacy"
+            let bLegacy = b.dataType == "SR Legacy"
+            if aLegacy != bLegacy { return aLegacy }
+            return false
+        }
+
+        guard let best = sorted.first else { return nil }
 
         return try await fetchNutrition(fdcId: best.id, foodName: best.name)
     }
@@ -58,10 +66,10 @@ final class USDANutritionRepository: NutritionLookupService, @unchecked Sendable
     // MARK: - Private
 
     private func fetchNutrition(fdcId: Int, foodName: String) async throws -> NutritionPer100g {
+        // Don't filter by nutrients — Foundation foods use different nutrient IDs
         var components = URLComponents(url: baseURL.appendingPathComponent("food/\(fdcId)"), resolvingAgainstBaseURL: false)!
         components.queryItems = [
-            URLQueryItem(name: "api_key", value: apiKey),
-            URLQueryItem(name: "nutrients", value: "208,203,205,204") // Energy, Protein, Carbs, Fat
+            URLQueryItem(name: "api_key", value: apiKey)
         ]
 
         guard let url = components.url else {
@@ -82,14 +90,24 @@ final class USDANutritionRepository: NutritionLookupService, @unchecked Sendable
         var fat = 0.0
 
         for nutrient in foodResponse.foodNutrients {
-            let id = nutrient.nutrient?.id ?? nutrient.number.flatMap(Int.init) ?? 0
+            let id = nutrient.nutrient?.id ?? 0
             let amount = nutrient.amount ?? 0
 
             switch id {
-            case 1008, 208: calories = amount  // Energy (kcal)
-            case 1003, 203: protein = amount   // Protein
-            case 1005, 205: carbs = amount     // Carbohydrates
-            case 1004, 204: fat = amount       // Total fat
+            // Energy: SR Legacy uses 1008, Foundation uses 2047 (Atwater General) or 2048 (Specific)
+            case 1008:
+                calories = amount
+            case 2047:
+                if calories == 0 { calories = amount }  // Use Atwater General as fallback
+            case 2048:
+                if calories == 0 { calories = amount }  // Use Atwater Specific as last resort
+
+            // Protein
+            case 1003: protein = amount
+            // Carbohydrates
+            case 1005: carbs = amount
+            // Total fat
+            case 1004: fat = amount
             default: break
             }
         }
@@ -122,7 +140,6 @@ private struct USDAFoodResponse: Decodable {
     struct USDAFoodNutrient: Decodable {
         let nutrient: NutrientInfo?
         let amount: Double?
-        let number: String?
 
         struct NutrientInfo: Decodable {
             let id: Int?

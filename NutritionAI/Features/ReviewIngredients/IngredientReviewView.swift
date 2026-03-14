@@ -48,6 +48,7 @@ struct IngredientReviewView: View {
                 }
             }
         }
+        .toolbar(.hidden, for: .tabBar)
         .navigationTitle("Review Ingredients")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

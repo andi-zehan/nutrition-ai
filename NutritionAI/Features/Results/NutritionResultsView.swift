@@ -64,6 +64,7 @@ struct NutritionResultsView: View {
                 .padding(.bottom, 32)
             }
         }
+        .toolbar(.hidden, for: .tabBar)
         .navigationTitle("Results")
         .navigationBarTitleDisplayMode(.inline)
     }

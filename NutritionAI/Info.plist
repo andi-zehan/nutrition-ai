@@ -18,6 +18,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>UILaunchScreen</key>
+	<dict/>
 	<key>NSCameraUsageDescription</key>
 	<string>NutritionAI needs camera access to photograph meals for ingredient detection.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

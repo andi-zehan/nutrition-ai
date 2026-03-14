@@ -8,9 +8,19 @@ final class IngredientNormalizationServiceTests: XCTestCase {
         XCTAssertFalse(result.hasPrefix(" "))
     }
 
-    func testSynonymReplacement() {
+    func testExactSynonymReplacement() {
         let result = IngredientNormalizationService.normalize("chicken breast")
-        XCTAssertEqual(result, "chicken, broilers or fryers, breast, meat only")
+        XCTAssertEqual(result, "chicken, broilers or fryers, breast, meat only, cooked, roasted")
+    }
+
+    func testPlainRiceMapsToCooked() {
+        let result = IngredientNormalizationService.normalize("rice")
+        XCTAssertEqual(result, "rice, white, long-grain, cooked")
+    }
+
+    func testModifierRemovalThenExactMatch() {
+        let result = IngredientNormalizationService.normalize("grilled chicken breast")
+        XCTAssertEqual(result, "chicken, broilers or fryers, breast, meat only, cooked, roasted")
     }
 
     func testModifierRemoval() {
@@ -25,7 +35,13 @@ final class IngredientNormalizationServiceTests: XCTestCase {
 
     func testExtraWhitespaceCollapsed() {
         let result = IngredientNormalizationService.normalize("  large   potato  ")
-        // "large " is removed, "potato" is mapped
         XCTAssertFalse(result.contains("  "))
+    }
+
+    func testCommonStaples() {
+        XCTAssertTrue(IngredientNormalizationService.normalize("egg").contains("egg"))
+        XCTAssertTrue(IngredientNormalizationService.normalize("pasta").contains("pasta"))
+        XCTAssertTrue(IngredientNormalizationService.normalize("banana").contains("banana"))
+        XCTAssertTrue(IngredientNormalizationService.normalize("milk").contains("milk"))
     }
 }

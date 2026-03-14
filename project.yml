@@ -23,6 +23,7 @@ targets:
     info:
       path: NutritionAI/Info.plist
       properties:
+        UILaunchScreen: {}
         NSCameraUsageDescription: NutritionAI needs camera access to photograph meals for ingredient detection.
         NSPhotoLibraryUsageDescription: NutritionAI needs photo library access to select meal photos.
         OPENROUTER_API_KEY: $(OPENROUTER_API_KEY)
